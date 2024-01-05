@@ -1,14 +1,21 @@
 {
   "name": "gh-pinned-repo",
   "version": "1.0.0",
-  "description": "",
+  "description": "A Node server to provide the pinned repositories of your GitHub account!",
   "main": "index.js",
   "scripts": {
     "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "github",
+    "pinned",
+    "repo",
+    "repository",
+    "node",
+    "server"
+  ],
+  "author": "Yash Suhagiya <yash@patentassist.ai>",
   "license": "ISC",
   "dependencies": {
     "cheerio": "^1.0.0-rc.12",
