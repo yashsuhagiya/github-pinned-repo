@@ -17,7 +17,7 @@ app.get('/', (req, res) => {
 app.get('/:username', async (req, res) => {
     const username = req.params.username;
     const pinnedRepos = await getPinnedRepo(username);
-    res.json({
+    res.send({
         data: pinnedRepos
     });
 });

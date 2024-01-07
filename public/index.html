@@ -134,7 +134,12 @@
     document.getElementById('usernameForm').addEventListener('submit', async function (event) {
       event.preventDefault();
       const username = document.getElementById('usernameInput').value;
-      const response = await fetch(`/${username}`);
+      const response = await fetch(`/${username}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      });
       const data = await response.json();
       displayRepos(data.data);
     });
