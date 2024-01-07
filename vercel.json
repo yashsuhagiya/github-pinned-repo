@@ -6,7 +6,10 @@
       "use": "@vercel/node"
     }
   ],
-  "redirects": [
-    { "source": "/", "destination": "public/index.html", "permanent": true }
+  "routes": [
+    {
+      "src": "/",
+      "dest": "/index.js"
+    }
   ]
 }
