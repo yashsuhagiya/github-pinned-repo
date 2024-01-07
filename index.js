@@ -6,13 +6,11 @@ const port = process.env.PORT || 3000;
 
 const getPinnedRepo = require("./utils/getPinnedRepo");
 
-app.use(express.static('public')); // Create a 'public' folder for your HTML, CSS, JS files
+app.use(express.static('public'));
 
 // Home page
 app.get('/', (req, res) => {
-    res.send({
-        message: 'Welcome to the GitHub Pinned Repo page! To get the pinned repos of a user, go to /username. For example: /yashsuhagiya'
-    });
+    res.sendFile(path.join(__dirname, '/public/index.html'));
 });
 
 // Route to handle the username-specific API
