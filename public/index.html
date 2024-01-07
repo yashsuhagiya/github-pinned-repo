@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>GitHub Pinned Repositories</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    body {
+      font-family: JetBrains Mono, monospace;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+      color: #333;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    #usernameForm {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    #usernameInput {
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      margin-right: 10px;
+    }
+
+    button[type="submit"] {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button[type="submit"]:hover {
+      background-color: #45a049;
+    }
+
+    .repo-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+    }
+
+    .repo-card {
+      width: 300px;
+      margin-bottom: 20px;
+      padding: 15px;
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      transition: box-shadow 0.3s ease;
+    }
+
+    .repo-card:hover {
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .repo-card h2 {
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+      color: #333;
+    }
+
+    .repo-card p {
+      font-size: 1rem;
+      color: #666;
+      margin-bottom: 8px;
+    }
+
+    .repo-card .language {
+      display: inline-block;
+      padding: 5px 10px;
+      border-radius: 5px;
+      background-color: #f0f0f0;
+      color: #333;
+      margin-bottom: 8px;
+    }
+
+    .repo-card .stars {
+      display: flex;
+      align-items: center;
+      color: #ffac33;
+    }
+
+    .repo-card .stars i {
+      margin-right: 5px;
+    }
+
+    .repo-card .forks {
+      display: flex;
+      align-items: center;
+      color: #36f;
+    }
+
+    .repo-card .forks i {
+      margin-right: 5px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>GitHub Pinned Repositories</h1>
+    <form id="usernameForm">
+      <input type="text" id="usernameInput" placeholder="Enter GitHub Username" required>
+      <button type="submit">Get Repos</button>
+    </form>
+
+    <div class="repo-container" id="reposContainer">
+      <!-- Repositories will be displayed here -->
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('usernameForm').addEventListener('submit', async function (event) {
+      event.preventDefault();
+      const username = document.getElementById('usernameInput').value;
+      const response = await fetch(`/${username}`);
+      const data = await response.json();
+      displayRepos(data.data);
+    });
+
+    function displayRepos(repos) {
+      const reposContainer = document.getElementById('reposContainer');
+      reposContainer.innerHTML = '';
+      repos.forEach(repo => {
+        const repoCard = document.createElement('div');
+        repoCard.classList.add('repo-card');
+        repoCard.innerHTML = `
+          <h2><a href="${repo.repo}" target="_blank">${repo.name}</a></h2>
+          <p>${repo.description || 'No description available'}</p>
+          <p class="language">${repo.language.name || 'Unknown'}</p>
+          <p class="stars"><i class="fas fa-star"></i>${repo.stars || 0}</p>
+          <p class="forks"><i class="fas fa-code-branch"></i>${repo.forks || 0}</p>
+        `;
+        reposContainer.appendChild(repoCard);
+      });
+    }
+  </script>
+</body>
+
+</html>
