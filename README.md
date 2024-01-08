@@ -7,7 +7,7 @@ A Node server to provide the pinned repositories of your GitHub account!
 ```bash
 git clone https://github.com/yashsuhagiya/gh-pinned-repo.git
 cd gh-pinned-repo
-npm install
-npm run dev
+pnpm install
+pnpm run dev
 ```
 
