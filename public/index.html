@@ -72,7 +72,7 @@
       .repo-card {
         width: 300px;
         margin-bottom: 20px;
-        padding: 15px;
+        padding: 20px;
         background-color: #fff;
         border-radius: 10px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -86,7 +86,15 @@
       .repo-card h2 {
         font-size: 1.5rem;
         margin-bottom: 10px;
-        color: #333;
+        color: #649df1;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+
+      .repo-card h2 a {
+        text-decoration: none;
+        color: #649df1;
       }
 
       .repo-card p {
@@ -173,7 +181,9 @@
           event.preventDefault();
 
           const loader = document.getElementById("loader");
-          loader.style.display = "block"; // Show loader while fetching data
+          if (loader) {
+            loader.style.display = "block"; // Show loader while fetching data
+          }
 
           const username = document.getElementById("usernameInput").value;
           const response = await fetch(`/${username}`, {
@@ -182,29 +192,37 @@
               Accept: "application/json",
             },
           });
+
           const data = await response.json();
 
-          loader.style.display = "none"; // Hide loader after data is received
+          if (loader) {
+            loader.style.display = "none"; // Hide loader after data is received
+          }
+
           displayRepos(data.data);
         });
 
       function displayRepos(repos) {
         const reposContainer = document.getElementById("reposContainer");
-        reposContainer.innerHTML = "";
-        repos.forEach((repo) => {
-          const repoCard = document.createElement("div");
-          repoCard.classList.add("repo-card");
-          repoCard.innerHTML = `
-          <h2><a href="${repo.repo}" target="_blank">${repo.name}</a></h2>
-          <p>${repo.description || "No description available"}</p>
-          <p class="language">${repo.language.name || "Unknown"}</p>
-          <p class="stars"><i class="fas fa-star"></i>${repo.stars || 0}</p>
-          <p class="forks"><i class="fas fa-code-branch"></i>${
-            repo.forks || 0
-          }</p>
-        `;
-          reposContainer.appendChild(repoCard);
-        });
+        if (reposContainer) {
+          reposContainer.innerHTML = "";
+          repos.forEach((repo) => {
+            const repoCard = document.createElement("div");
+            repoCard.classList.add("repo-card");
+            repoCard.innerHTML = `
+              <h2><a href="${repo.repo}" target="_blank">${repo.name}</a></h2>
+              <p>${repo.description || "No description available"}</p>
+              <p class="language">${
+                repo.language.name || "No language available"
+              }</p>
+              <p class="stars"><i class="fas fa-star"></i>${repo.stars || 0}</p>
+              <p class="forks"><i class="fas fa-code-branch"></i>${
+                repo.forks || 0
+              }</p>
+            `;
+            reposContainer.appendChild(repoCard);
+          });
+        }
       }
     </script>
   </body>
