@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "A Node server to provide the pinned repositories of your GitHub account!",
   "main": "index.ts",
-  "type": "module",
   "scripts": {
     "dev": "bun run index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
