@@ -1,13 +1,12 @@
 # GitHub Pinned Repositories
 
-A Node server to provide the pinned repositories of your GitHub account!
+A Hono server using bun to provide the pinned repositories of your GitHub account!
 
-# How to run
+## How to run
 
 ```bash
 git clone https://github.com/yashsuhagiya/github-pinned-repo.git
 cd github-pinned-repo
-pnpm install
-pnpm run dev
+bun install
+bun run dev
 ```
-
