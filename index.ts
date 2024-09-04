@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { serveStatic } from "hono/bun";
-import getPinnedRepo from "./utils/getPinnedRepo";
+import getPinnedRepo from "./utils/getPinnedRepo.ts";
 
 const app = new Hono();
 const port = process.env.PORT || 3000;

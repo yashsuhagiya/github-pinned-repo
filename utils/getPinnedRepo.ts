@@ -33,8 +33,8 @@ const getPinnedRepos = async (username: string): Promise<RepoData[] | null> => {
     // Loop through each pinned repository in the item list
     $(".js-pinned-item-list-item").each((i, el) => {
       const repoData: RepoData = {
-        name: $(el).find("a").get(0)?.attribs.href.split("/")[2] || "",
-        repo: BASE_GITHUB_URL + ($(el).find("a").get(0)?.attribs.href || ""),
+        name: $(el).find("a").get(0)?.attribs?.["href"]?.split("/")[2] || "",
+        repo: BASE_GITHUB_URL + ($(el).find("a").get(0)?.attribs["href"] || ""),
         description: $(el)
           .find("p.pinned-item-desc")
           .text()
@@ -46,9 +46,9 @@ const getPinnedRepos = async (username: string): Promise<RepoData[] | null> => {
             $(el)
               .find("span.repo-language-color")
               .get(0)
-              ?.attribs.style.split(":")[1]
-              .replace(";", "")
-              .trim() || "",
+              ?.attribs?.["style"]?.split(":")[1]
+              ?.replace(";", "")
+              ?.trim() || "",
         },
         stars:
           parseInt(
