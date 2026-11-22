@@ -8,6 +8,8 @@ const USERNAME_RE = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 const app = express();
 app.disable("x-powered-by");
 app.use(express.static(path.join(import.meta.dirname, "../public")));
+// On Vercel, public/ lives on the CDN and "/" reaches this function; send it to the static page.
+app.get("/", (_req, res) => res.redirect("/index.html"));
 
 app.param("username", (_req, _res, next, value) => {
   if (!USERNAME_RE.test(String(value))) {
