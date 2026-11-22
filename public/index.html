@@ -1,229 +1,278 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>GitHub Pinned Repositories</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="GitHub Pinned Repositories" />
-    <meta name="keywords" content="GitHub Pinned Repositories" />
-    <meta name="author" content="Yash Suhagiya" />
-    <meta name="robots" content="index, follow" />
-    <meta name="googlebot" content="index, follow" />
-    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
-    />
-    <style>
-      body {
-        font-family: JetBrains Mono, monospace;
-        margin: 0;
-        padding: 0;
-        background-color: #f4f4f4;
-        color: #333;
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Get any GitHub user's pinned repositories as JSON or an SVG card.">
+  <title>GitHub Pinned Repositories API</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --fg: #1f2328;
+      --muted: #59636e;
+      --border: #d1d9e0;
+      --surface: #f6f8fa;
+      --accent: #0969da;
+      --danger: #cf222e;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0d1117;
+        --fg: #e6edf3;
+        --muted: #9198a1;
+        --border: #3d444d;
+        --surface: #151b23;
+        --accent: #4493f8;
+        --danger: #ff7b72;
       }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    main { max-width: 760px; margin: 0 auto; padding: 48px 20px 64px; }
+    h1 { font-size: 1.6rem; margin: 0 0 8px; }
+    h2 { font-size: 1rem; margin: 0 0 8px; color: var(--muted); }
+    p { margin: 0 0 12px; }
+    a { color: var(--accent); }
+    code, pre {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.875rem;
+    }
+    .muted { color: var(--muted); }
+    form {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin: 24px 0;
+      padding: 16px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--surface);
+    }
+    .field { display: flex; flex-direction: column; gap: 4px; }
+    label { font-size: 0.875rem; font-weight: 600; }
+    input, select, button {
+      font: inherit;
+      color: var(--fg);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 6px 10px;
+    }
+    select:disabled { opacity: 0.5; }
+    button { cursor: pointer; }
+    button:hover { border-color: var(--muted); }
+    button.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .submit { align-self: end; }
+    .row { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; }
+    .row code {
+      flex: 1;
+      min-width: 0;
+      overflow-x: auto;
+      white-space: nowrap;
+      padding: 6px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--surface);
+    }
+    .row button { padding: 4px 10px; font-size: 0.875rem; }
+    #status.err { color: var(--danger); }
+    pre {
+      margin: 0 0 12px;
+      padding: 12px;
+      max-height: 480px;
+      overflow: auto;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--surface);
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    #preview img { max-width: 100%; height: auto; display: block; margin-bottom: 12px; }
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>GitHub Pinned Repositories API</h1>
+    <p>Fetch any GitHub user's pinned repositories as JSON, render them as an embeddable SVG card, or list their public repositories. No API key required.</p>
+    <p class="muted"><a href="/openapi.yaml">OpenAPI spec</a> &middot; <a href="https://github.com/yashsuhagiya/github-pinned-repo">Source on GitHub</a></p>
 
-      .container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 20px;
-      }
-
-      h1 {
-        text-align: center;
-        margin-bottom: 30px;
-      }
-
-      #usernameForm {
-        display: flex;
-        justify-content: center;
-        margin-bottom: 20px;
-      }
-
-      #usernameInput {
-        padding: 10px;
-        font-size: 16px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        margin-right: 10px;
-      }
-
-      button[type="submit"] {
-        padding: 10px 20px;
-        font-size: 16px;
-        background-color: #4caf50;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-      }
-
-      button[type="submit"]:hover {
-        background-color: #45a049;
-      }
-
-      .repo-container {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-around;
-      }
-
-      .repo-card {
-        width: 300px;
-        margin-bottom: 20px;
-        padding: 20px;
-        background-color: #fff;
-        border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        transition: box-shadow 0.3s ease;
-      }
-
-      .repo-card:hover {
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-      }
-
-      .repo-card h2 {
-        font-size: 1.5rem;
-        margin-bottom: 10px;
-        color: #649df1;
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-      }
-
-      .repo-card h2 a {
-        text-decoration: none;
-        color: #649df1;
-      }
-
-      .repo-card p {
-        font-size: 1rem;
-        color: #666;
-        margin-bottom: 8px;
-      }
-
-      .repo-card .language {
-        display: inline-block;
-        padding: 5px 10px;
-        border-radius: 5px;
-        background-color: #f0f0f0;
-        color: #333;
-        margin-bottom: 8px;
-      }
-
-      .repo-card .stars {
-        display: flex;
-        align-items: center;
-        color: #ffac33;
-      }
-
-      .repo-card .stars i {
-        margin-right: 5px;
-      }
-
-      .repo-card .forks {
-        display: flex;
-        align-items: center;
-        color: #36f;
-      }
-
-      .repo-card .forks i {
-        margin-right: 5px;
-      }
-
-      /* Add this to your existing CSS */
-      .loader {
-        border: 4px solid rgba(0, 0, 0, 0.1);
-        border-top: 4px solid #333;
-        border-radius: 50%;
-        width: 30px;
-        height: 30px;
-        animation: spin 1s linear infinite;
-        margin: 20px auto;
-        display: none; /* Initially hide the loader */
-      }
-
-      @keyframes spin {
-        0% {
-          transform: rotate(0deg);
-        }
-        100% {
-          transform: rotate(360deg);
-        }
-      }
-    </style>
-  </head>
-
-  <body>
-    <div class="container">
-      <h1>GitHub Pinned Repositories</h1>
-      <form id="usernameForm">
-        <input
-          type="text"
-          id="usernameInput"
-          placeholder="Enter GitHub Username"
-          required
-        />
-        <button type="submit">Get Repos</button>
-      </form>
-
-      <div class="repo-container" id="reposContainer">
-        <!-- Repositories will be displayed here -->
-        <div class="loader" id="loader"></div>
+    <form id="form" novalidate>
+      <div class="field">
+        <label for="username">Username</label>
+        <input id="username" name="username" type="text" value="yashsuhagiya" autocomplete="off" autocapitalize="off" spellcheck="false">
       </div>
-    </div>
+      <div class="field">
+        <label for="endpoint">Endpoint</label>
+        <select id="endpoint" name="endpoint">
+          <option value="pinned">Pinned JSON: /{username}</option>
+          <option value="svg">SVG card: /{username}.svg</option>
+          <option value="repos">Repositories: /{username}/repos</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="theme">Theme (SVG only)</label>
+        <select id="theme" name="theme" disabled>
+          <option value="light">light</option>
+          <option value="dark">dark</option>
+        </select>
+      </div>
+      <div class="field submit">
+        <button type="submit" class="primary">Send request</button>
+      </div>
+    </form>
 
-    <script>
-      document
-        .getElementById("usernameForm")
-        .addEventListener("submit", async function (event) {
-          event.preventDefault();
+    <section id="result" hidden aria-labelledby="result-title">
+      <h2 id="result-title">Request</h2>
+      <div class="row">
+        <code id="url" aria-label="Request URL"></code>
+        <button type="button" data-copy="url">Copy</button>
+      </div>
+      <p id="status" aria-live="polite"></p>
+      <div id="preview" hidden></div>
+      <div id="snippet-wrap" hidden>
+        <h2>Markdown embed</h2>
+        <div class="row">
+          <code id="snippet" aria-label="Markdown embed"></code>
+          <button type="button" data-copy="snippet">Copy</button>
+        </div>
+      </div>
+      <pre id="output" hidden></pre>
+    </section>
+  </main>
 
-          const loader = document.getElementById("loader");
-          if (loader) {
-            loader.style.display = "block"; // Show loader while fetching data
-          }
+  <script>
+    (function () {
+      var form = document.getElementById("form");
+      var usernameEl = document.getElementById("username");
+      var endpointEl = document.getElementById("endpoint");
+      var themeEl = document.getElementById("theme");
+      var resultEl = document.getElementById("result");
+      var urlEl = document.getElementById("url");
+      var statusEl = document.getElementById("status");
+      var previewEl = document.getElementById("preview");
+      var snippetWrap = document.getElementById("snippet-wrap");
+      var snippetEl = document.getElementById("snippet");
+      var outputEl = document.getElementById("output");
+      var seq = 0;
 
-          const username = document.getElementById("usernameInput").value;
-          const response = await fetch(`/${username}`, {
-            headers: {
-              "Content-Type": "application/json",
-              Accept: "application/json",
-            },
-          });
+      endpointEl.addEventListener("change", function () {
+        themeEl.disabled = endpointEl.value !== "svg";
+      });
 
-          const data = await response.json();
-
-          if (loader) {
-            loader.style.display = "none"; // Hide loader after data is received
-          }
-
-          displayRepos(data.data);
-        });
-
-      function displayRepos(repos) {
-        const reposContainer = document.getElementById("reposContainer");
-        if (reposContainer) {
-          reposContainer.innerHTML = "";
-          repos.forEach((repo) => {
-            const repoCard = document.createElement("div");
-            repoCard.classList.add("repo-card");
-            repoCard.innerHTML = `
-              <h2><a href="${repo.repo}" target="_blank">${repo.name}</a></h2>
-              <p>${repo.description || "No description available"}</p>
-              <p class="language">${
-                repo.language.name || "No language available"
-              }</p>
-              <p class="stars"><i class="fas fa-star"></i>${repo.stars || 0}</p>
-              <p class="forks"><i class="fas fa-code-branch"></i>${
-                repo.forks || 0
-              }</p>
-            `;
-            reposContainer.appendChild(repoCard);
-          });
-        }
+      function setStatus(text, isError) {
+        statusEl.textContent = text;
+        statusEl.className = isError ? "err" : "";
       }
-    </script>
-  </body>
+
+      function showOutput(text) {
+        outputEl.textContent = text;
+        outputEl.hidden = false;
+      }
+
+      function describeError(res, body, ms) {
+        var msg = "";
+        try { msg = JSON.parse(body).error || ""; } catch (e) { /* not JSON */ }
+        setStatus("HTTP " + res.status + " · " + ms + " ms" + (msg ? " · " + msg : ""), true);
+        showOutput(msg || body);
+      }
+
+      form.addEventListener("submit", function (event) {
+        event.preventDefault();
+        var id = ++seq;
+        var username = usernameEl.value.trim();
+        var endpoint = endpointEl.value;
+        var theme = themeEl.value;
+
+        previewEl.hidden = true;
+        previewEl.textContent = "";
+        snippetWrap.hidden = true;
+        outputEl.hidden = true;
+        outputEl.textContent = "";
+
+        if (!username) {
+          resultEl.hidden = false;
+          urlEl.textContent = "";
+          setStatus("Enter a GitHub username.", true);
+          usernameEl.focus();
+          return;
+        }
+
+        var path = "/" + encodeURIComponent(username);
+        if (endpoint === "svg") path += ".svg?theme=" + encodeURIComponent(theme);
+        else if (endpoint === "repos") path += "/repos";
+        var url = location.origin + path;
+
+        resultEl.hidden = false;
+        urlEl.textContent = url;
+        setStatus("Loading…", false);
+
+        var start = performance.now();
+
+        if (endpoint === "svg") {
+          var img = document.createElement("img");
+          img.alt = "Pinned repositories of " + username;
+          img.addEventListener("load", function () {
+            if (id !== seq) return;
+            setStatus("HTTP 200 · " + Math.round(performance.now() - start) + " ms", false);
+          });
+          img.addEventListener("error", function () {
+            if (id !== seq) return;
+            previewEl.hidden = true;
+            snippetWrap.hidden = true;
+            fetch(url).then(function (res) {
+              return res.text().then(function (body) {
+                if (id === seq) describeError(res, body, Math.round(performance.now() - start));
+              });
+            }).catch(function (err) {
+              if (id === seq) setStatus("Request failed: " + err.message, true);
+            });
+          });
+          img.src = url;
+          previewEl.appendChild(img);
+          previewEl.hidden = false;
+          snippetEl.textContent = "![Pinned repositories](" + url + ")";
+          snippetWrap.hidden = false;
+          return;
+        }
+
+        fetch(url).then(function (res) {
+          return res.text().then(function (body) {
+            if (id !== seq) return;
+            var ms = Math.round(performance.now() - start);
+            if (!res.ok) {
+              describeError(res, body, ms);
+              return;
+            }
+            setStatus("HTTP " + res.status + " · " + ms + " ms", false);
+            var text = body;
+            try { text = JSON.stringify(JSON.parse(body), null, 2); } catch (e) { /* show raw */ }
+            showOutput(text);
+          });
+        }).catch(function (err) {
+          if (id === seq) setStatus("Request failed: " + err.message, true);
+        });
+      });
+
+      document.addEventListener("click", function (event) {
+        var btn = event.target.closest("button[data-copy]");
+        if (!btn) return;
+        var text = document.getElementById(btn.getAttribute("data-copy")).textContent;
+        navigator.clipboard.writeText(text).then(function () {
+          btn.textContent = "Copied";
+        }, function () {
+          btn.textContent = "Failed";
+        });
+        setTimeout(function () { btn.textContent = "Copy"; }, 1500);
+      });
+    })();
+  </script>
+</body>
 </html>
