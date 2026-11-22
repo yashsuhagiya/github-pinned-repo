@@ -2,6 +2,8 @@
 
 A small Express 5 and TypeScript service that returns the pinned repositories of a GitHub user. GitHub's REST API does not expose pinned repositories, so this service returns them as JSON or as an embeddable SVG card. It runs on Vercel at https://github-pinned-repositories.vercel.app.
 
+![Pinned repositories](https://github-pinned-repositories.vercel.app/yashsuhagiya.svg)
+
 ## Endpoints
 
 | Method and path | Returns | Cache |
@@ -70,11 +72,11 @@ An unknown user used to return 200 with an empty list. It now returns 404.
 
 | | Before | After |
 |---|---|---|
-| Median response, repeat request | TBD | TBD |
-| p90 response, repeat request | TBD | TBD |
-| CDN cache | none (every request scraped GitHub) | TBD |
+| Median response, repeat request | 277 ms | 113 ms |
+| p90 response, repeat request | 323 ms | 139 ms |
+| CDN cache | none (every request scraped GitHub) | `HIT` after the first request |
 
-Numbers were measured with curl from Germany against the production URL.
+Numbers were measured with curl from Germany against the production URL (20 repeat requests each). A cache miss still costs about 300 ms, because it has to fetch from GitHub.
 
 ## Reliability
 
