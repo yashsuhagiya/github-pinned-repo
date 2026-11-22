@@ -1,0 +1,36 @@
+name: Canary
+
+on:
+  schedule:
+    - cron: "17 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  canary:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: node scripts/canary.ts
+      - name: Report failure as an issue
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          TITLE="Canary: pinned-repo scraper failing"
+          NUMBER=$(gh issue list --state open --search "in:title \"$TITLE\"" --json number,title --jq ".[] | select(.title==\"$TITLE\") | .number" | head -1)
+          if [ -n "$NUMBER" ]; then
+            gh issue comment "$NUMBER" --body "Still failing: $RUN_URL"
+          else
+            gh issue create --title "$TITLE" --body "The daily canary could not parse pinned repos from a live GitHub profile. GitHub may have changed its markup. Run: $RUN_URL"
+          fi

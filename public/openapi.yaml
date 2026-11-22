@@ -1,0 +1,207 @@
+openapi: 3.1.0
+info:
+  title: GitHub Pinned Repositories API
+  version: 2.0.0
+  description: >-
+    Returns a GitHub user's pinned repositories as JSON or as an embeddable SVG
+    card, and lists their public repositories.
+  license:
+    name: ISC
+    identifier: ISC
+servers:
+  - url: https://github-pinned-repositories.vercel.app
+security: []
+paths:
+  /{username}:
+    get:
+      operationId: getPinned
+      summary: Get a user's pinned repositories
+      parameters:
+        - $ref: "#/components/parameters/username"
+      responses:
+        "200":
+          description: Pinned repositories.
+          headers:
+            Cache-Control:
+              $ref: "#/components/headers/CachePinned"
+            ETag:
+              $ref: "#/components/headers/ETag"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pinned"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "502":
+          $ref: "#/components/responses/BadGateway"
+  /{username}.svg:
+    get:
+      operationId: getPinnedCard
+      summary: Get a user's pinned repositories as an SVG card
+      parameters:
+        - $ref: "#/components/parameters/username"
+        - name: theme
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [light, dark]
+            default: light
+      responses:
+        "200":
+          description: SVG card.
+          headers:
+            Cache-Control:
+              $ref: "#/components/headers/CachePinned"
+            ETag:
+              $ref: "#/components/headers/ETag"
+          content:
+            image/svg+xml:
+              schema:
+                type: string
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "502":
+          $ref: "#/components/responses/BadGateway"
+  /{username}/repos:
+    get:
+      operationId: getRepos
+      summary: List a user's public repositories (up to 100)
+      parameters:
+        - $ref: "#/components/parameters/username"
+      responses:
+        "200":
+          description: Array of GitHub REST repository objects.
+          headers:
+            Cache-Control:
+              $ref: "#/components/headers/CacheRepos"
+            ETag:
+              $ref: "#/components/headers/ETag"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  description: A GitHub REST API repository object.
+                  additionalProperties: true
+                  properties:
+                    name:
+                      type: string
+                    html_url:
+                      type: string
+                      format: uri
+                    fork:
+                      type: boolean
+                    stargazers_count:
+                      type: integer
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "502":
+          $ref: "#/components/responses/BadGateway"
+components:
+  parameters:
+    username:
+      name: username
+      in: path
+      required: true
+      description: GitHub username (case-insensitive).
+      schema:
+        type: string
+        pattern: "^[a-z\\d](?:[a-z\\d]|-(?=[a-z\\d])){0,38}$"
+      example: yashsuhagiya
+  headers:
+    CachePinned:
+      description: Edge cache policy.
+      schema:
+        type: string
+        example: public, s-maxage=3600, stale-while-revalidate=86400
+    CacheRepos:
+      description: Edge cache policy.
+      schema:
+        type: string
+        example: public, s-maxage=43200, stale-while-revalidate=86400
+    CacheNoStore:
+      description: Errors are never cached.
+      schema:
+        type: string
+        example: no-store
+    ETag:
+      description: Entity tag for conditional requests.
+      schema:
+        type: string
+  responses:
+    BadRequest:
+      description: Invalid username.
+      headers:
+        Cache-Control:
+          $ref: "#/components/headers/CacheNoStore"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    NotFound:
+      description: GitHub user not found.
+      headers:
+        Cache-Control:
+          $ref: "#/components/headers/CacheNoStore"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    BadGateway:
+      description: The request to GitHub failed.
+      headers:
+        Cache-Control:
+          $ref: "#/components/headers/CacheNoStore"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+  schemas:
+    PinnedRepo:
+      type: object
+      required: [name, repo, description, language, stars, forks]
+      properties:
+        name:
+          type: string
+        repo:
+          type: string
+          format: uri
+        description:
+          type: string
+        language:
+          type: object
+          required: [name, color]
+          properties:
+            name:
+              type: string
+            color:
+              type: string
+        stars:
+          type: integer
+        forks:
+          type: integer
+    Pinned:
+      type: object
+      required: [source, data]
+      properties:
+        source:
+          type: string
+          enum: [graphql, html]
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/PinnedRepo"
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string

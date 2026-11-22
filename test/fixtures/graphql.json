@@ -1,0 +1,37 @@
+{
+  "data": {
+    "user": {
+      "pinnedItems": {
+        "nodes": [
+          {
+            "name": "alpha",
+            "url": "https://github.com/octocat/alpha",
+            "description": "First repo",
+            "isPrivate": false,
+            "stargazerCount": 120,
+            "forkCount": 7,
+            "primaryLanguage": { "name": "TypeScript", "color": "#3178c6" }
+          },
+          {
+            "name": "beta",
+            "url": "https://github.com/octocat/beta",
+            "description": null,
+            "isPrivate": false,
+            "stargazerCount": 3,
+            "forkCount": 0,
+            "primaryLanguage": null
+          },
+          {
+            "name": "secret",
+            "url": "https://github.com/octocat/secret",
+            "description": "Hidden",
+            "isPrivate": true,
+            "stargazerCount": 1,
+            "forkCount": 1,
+            "primaryLanguage": { "name": "Go", "color": "#00ADD8" }
+          }
+        ]
+      }
+    }
+  }
+}
